@@ -166,7 +166,11 @@ int main() {
     // load models
     // -----------
     Model ourModel("resources/objects/obj/Gear1.obj");
+    Model moonModel("resources/objects/Moon.obj");
+
     ourModel.SetShaderTextureNamePrefix("material.");
+    moonModel.SetShaderTextureNamePrefix("material.");
+
 
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
@@ -224,10 +228,26 @@ int main() {
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3(-4,-9,0)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.5,0.5,0.5));    // it's a bit too big for our scene, so scale it down
+                               glm::vec3(-4,0,6)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.7,0.7,0.7));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
+
+
+
+
+
+
+        glm::mat4 moonModelMatrix = glm::mat4(1.0f);
+        moonModelMatrix = glm::translate(moonModelMatrix, glm::vec3(4,9,-60)); // postavljamo poziciju meseca
+        moonModelMatrix = glm::scale(moonModelMatrix, glm::vec3(0.25f)); // možemo skalirati veličinu meseca po potrebi
+
+        ourShader.setMat4("model", moonModelMatrix);
+        moonModel.Draw(ourShader);
+
+
+
+
 
 //        if (programState->ImGuiEnabled)
 //            DrawImGui(programState);
@@ -346,3 +366,4 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 }
+
