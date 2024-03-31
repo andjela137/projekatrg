@@ -13,6 +13,8 @@
 #include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
 #include <learnopengl/model.h>
+#include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include <iostream>
 
@@ -102,6 +104,11 @@ void ProgramState::LoadFromFile(std::string filename) {
 
 ProgramState *programState;
 
+unsigned int loadTexture(const char *path);
+
+
+
+
 //void DrawImGui(ProgramState *programState);
 
 int main() {
@@ -162,6 +169,9 @@ int main() {
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
@@ -172,6 +182,13 @@ int main() {
     ourModel.SetShaderTextureNamePrefix("material.");
     Model moonModel("resources/objects/moon/Moon_2K.obj");
     moonModel.SetShaderTextureNamePrefix(" resources/objects/moon/Moon_2K.mtl");
+
+
+
+
+
+
+
 
 
 
@@ -205,6 +222,9 @@ int main() {
         processInput(window);
 
 
+
+
+
         // render
         // ------
         glClearColor(programState->clearColor.r, programState->clearColor.g, programState->clearColor.b, 1.0f);
@@ -212,6 +232,7 @@ int main() {
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
+
         pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
@@ -229,27 +250,39 @@ int main() {
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
+
+
+
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3(-4,4,6)); // translate it down so it's at the center of the scene
+                               glm::vec3(-4,4,6));// translate it down so it's at the center of the scene
+
         model = glm::scale(model, glm::vec3(0.7,0.7,0.7));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
+        glm::vec3 objectPosition = glm::vec3(model[3]);
 
 
 
 
+        float time=glfwGetTime();
 
         glm::mat4 moonModelMatrix = glm::mat4(1.0f);
-        float time=glfwGetTime();
+
 
         moonModelMatrix = glm::translate(moonModelMatrix, glm::vec3(30*cos(time),15,-60*sin(time))); // postavljamo poziciju meseca
         moonModelMatrix = glm::scale(moonModelMatrix, glm::vec3(3.0f)); // možemo skalirati veličinu meseca po potrebi
 
         ourShader.setMat4("model", moonModelMatrix);
+
+
+
         moonModel.Draw(ourShader);
+
+
+
 
 
 
