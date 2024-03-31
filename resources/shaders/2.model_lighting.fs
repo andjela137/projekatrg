@@ -23,10 +23,12 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
+
 uniform PointLight pointLight;
 uniform Material material;
 
 uniform vec3 viewPosition;
+
 // calculates the color when using a point light.
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -56,5 +58,10 @@ void main()
     vec3 viewDir = normalize(viewPosition - FragPos);
 
     vec3 result = CalcPointLight(pointLight, normal, FragPos, viewDir);
-    FragColor = vec4(result, 1.0);
+
+
+     FragColor = vec4(result, 1.0);
+
+
+
 }

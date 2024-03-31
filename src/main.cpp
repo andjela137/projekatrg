@@ -107,7 +107,7 @@ ProgramState *programState;
 unsigned int loadTexture(const char *path);
 
 
-
+Camera camera(glm::vec3(2.0f,40.0f,47.0f));
 
 //void DrawImGui(ProgramState *programState);
 
@@ -172,6 +172,10 @@ int main() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
@@ -182,6 +186,8 @@ int main() {
     ourModel.SetShaderTextureNamePrefix("material.");
     Model moonModel("resources/objects/moon/Moon_2K.obj");
     moonModel.SetShaderTextureNamePrefix(" resources/objects/moon/Moon_2K.mtl");
+
+
 
 
 
@@ -205,6 +211,8 @@ int main() {
 
 
 
+
+
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -220,6 +228,7 @@ int main() {
         // input
         // -----
         processInput(window);
+
 
 
 
@@ -254,6 +263,7 @@ int main() {
 
 
         // render the loaded model
+
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
                                glm::vec3(-4,4,6));// translate it down so it's at the center of the scene
@@ -261,9 +271,6 @@ int main() {
         model = glm::scale(model, glm::vec3(0.7,0.7,0.7));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
-
-        glm::vec3 objectPosition = glm::vec3(model[3]);
-
 
 
 
@@ -280,6 +287,14 @@ int main() {
 
 
         moonModel.Draw(ourShader);
+
+
+
+
+
+
+
+
 
 
 
