@@ -28,16 +28,14 @@ uniform PointLight pointLight;
 uniform Material material;
 
 uniform vec3 viewPosition;
-uniform sampler2D floorTexture;
+
 
 // calculates the color when using a point light.
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    // Osvjetljenje za pod
-    vec3 podColor = 1.0 * texture(floorTexture, TexCoords).rgb;
 
-    // Osvjetljenje za modele
+ // Osvjetljenje za modele
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 specular = light.specular * pow(max(dot(viewDir, reflect(-lightDir, normal)), 0.0), material.shininess);
@@ -49,8 +47,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     diffuse *= attenuation;
     specular *= attenuation;
 
-    // Kombinacija osvjetljenja za modele i osvjetljenja za pod
-    return podColor + (ambient + diffuse + specular);
+
+    return (ambient + diffuse + specular);
 }
 
 void main()

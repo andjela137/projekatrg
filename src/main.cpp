@@ -41,6 +41,7 @@ const unsigned int SCR_HEIGHT = 600;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+bool blinn = false;
 
 // timing
 float deltaTime = 0.0f;
@@ -184,7 +185,7 @@ int main() {
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
-
+    Shader shader("resources/shaders/floor.vs","resources/shaders/floor.fs");
     // load models
     // -----------
     Model ourModel("resources/objects/obj/Gear1.obj");
@@ -225,8 +226,8 @@ int main() {
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/pngwing.com.png").c_str());
 
 
-    ourShader.use();
-    ourShader.setInt("texture1", 0);
+    shader.use();
+    shader.setInt("texture1", 0);
 
 
 
@@ -246,7 +247,7 @@ int main() {
 
 
 
-
+    glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 
 
     // draw in wireframe
@@ -324,14 +325,16 @@ int main() {
 
         moonModel.Draw(ourShader);
 
+        shader.use();
 
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+        // set light uniforms
+        shader.setVec3("viewPos", programState->camera.Position);
+        shader.setVec3("lightPos",lightPos);
+        shader.setInt("blinn", blinn);
 
-
-
-
-
-
-        ourShader.use();
+        // floor
         glBindVertexArray(planeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
@@ -352,6 +355,9 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1,&planeVAO);
+    glDeleteBuffers(1,&planeVBO);
 
     programState->SaveToFile("resources/program_state.txt");
     delete programState;
