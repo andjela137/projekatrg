@@ -16,6 +16,7 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
+
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -108,13 +109,16 @@ ProgramState *programState;
 unsigned int loadTexture(const char *path);
 
 
-Camera camera(glm::vec3(2.0f,40.0f,47.0f));
+
+
 
 //void DrawImGui(ProgramState *programState);
 
 int main() {
     // glfw: initialize and configure
     // ------------------------------
+
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -200,9 +204,11 @@ int main() {
     };
 
     unsigned int planeVAO, planeVBO;
+
     glGenVertexArrays(1, &planeVAO);
     glGenBuffers(1, &planeVBO);
     glBindVertexArray(planeVAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
