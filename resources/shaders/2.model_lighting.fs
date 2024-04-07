@@ -28,6 +28,7 @@ uniform PointLight pointLight;
 uniform Material material;
 
 uniform vec3 viewPosition;
+uniform sampler2D floorTexture;
 
 // calculates the color when using a point light.
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -54,6 +55,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 void main()
 {
+    vec3 color = texture(floorTexture, TexCoords).rgb;
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewPosition - FragPos);
 

@@ -30,6 +30,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 
 
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -187,12 +188,39 @@ int main() {
     Model moonModel("resources/objects/moon/Moon_2K.obj");
     moonModel.SetShaderTextureNamePrefix(" resources/objects/moon/Moon_2K.mtl");
 
+    float planeVertices[] = {
+            // positions            // normals         // texcoords
+            6.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,  6.0f,  0.0f,
+            -4.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+            -4.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,   0.0f, 6.0f,
+
+            6.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,  6.0f,  0.0f,
+            -4.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,   0.0f, 6.0f,
+            6.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,  6.0f, 6.0f
+    };
+
+    unsigned int planeVAO, planeVBO;
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
 
 
+    // load textures
+    // -------------
+    unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/pngwing.com.png").c_str());
 
 
-
-
+    ourShader.use();
+    ourShader.setInt("texture1", 0);
 
 
 
@@ -208,6 +236,8 @@ int main() {
     pointLight.constant = 1.0f;
     pointLight.linear = 0.0f;
     pointLight.quadratic = 0.0f;
+
+
 
 
 
@@ -295,8 +325,11 @@ int main() {
 
 
 
-
-
+        ourShader.use();
+        glBindVertexArray(planeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
 
@@ -419,5 +452,43 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
+}
+
+
+unsigned int loadTexture(char const * path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }
 
