@@ -42,8 +42,7 @@ public:
     float Zoom;
 
     // constructor with vectors
-
-    Camera(glm::vec3 position = glm::vec3(-4.0f, 4.0f, 12.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = position;
         WorldUp = up;
@@ -51,10 +50,10 @@ public:
         Pitch = pitch;
         updateCameraVectors();
     }
- //    constructor with scalar values
+    // constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
-        Position = glm::vec3(posX, 50.0, 0.0);
+        Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);
         Yaw = yaw;
         Pitch = pitch;
@@ -81,6 +80,12 @@ public:
             Position += Right * velocity;
     }
 
+    void ChangeSpeed(bool speedup)
+    {
+        if(speedup) MovementSpeed=10.0f;
+        else MovementSpeed=2.5f;
+    }
+
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
     {
@@ -100,10 +105,8 @@ public:
         }
 
         // update Front, Right and Up Vectors using the updated Euler angles
-      updateCameraVectors();
+        updateCameraVectors();
     }
-
-
 
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset)
@@ -112,7 +115,7 @@ public:
         if (Zoom < 1.0f)
             Zoom = 1.0f;
         if (Zoom > 45.0f)
-            Zoom = 45.0f; 
+            Zoom = 45.0f;
     }
 
 private:
