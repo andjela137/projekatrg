@@ -196,36 +196,45 @@ int main() {
     moonModel.SetShaderTextureNamePrefix(" resources/objects/moon/Moon_2K.mtl");
 
     float planeVertices[] = {
-            // positions            // normals         // texcoords
-            6.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,  6.0f,  0.0f,
-            -4.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-            -4.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,   0.0f, 6.0f,
-
-            6.0f, -0.5f,  6.0f,  0.0f, 1.0f, 0.0f,  6.0f,  0.0f,
-            -4.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,   0.0f, 6.0f,
-            6.0f, -0.5f, -4.0f,  0.0f, 1.0f, 0.0f,  6.0f, 6.0f
+            // positions          // colors           // texture coords
+            100.5f,  0.5f, -300.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+            100.5f, -0.5f, 100.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+            -100.5f, -0.5f, 100.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+            -100.5f,  0.5f, -300.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+    };
+    unsigned int indices[] = {
+            0, 1, 3, // first triangle
+            1, 2, 3  // second triangle
     };
 
-    unsigned int planeVAO, planeVBO;
 
+    unsigned int planeVBO, planeVAO, planeEBO;
     glGenVertexArrays(1, &planeVAO);
     glGenBuffers(1, &planeVBO);
+    glGenBuffers(1, &planeEBO);
+
     glBindVertexArray(planeVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(0);
+    // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glBindVertexArray(0);
+    glEnableVertexAttribArray(2);
 
 
     // load textures
     // -------------
-    unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/texture-green-grass-surface-wallpaper-concept.jpg").c_str());
+    unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/black_wood.jpg").c_str());
 
 
     shader.use();
@@ -287,12 +296,12 @@ int main() {
 
     vector<std::string> faces
             {
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_rt.tga"),
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_lf.tga"),
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_up.tga"),
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_dn.tga"),
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_ft.tga"),
-                    FileSystem::getPath("resources/textures/coward-cove/coward-cove_bk.tga")
+                    FileSystem::getPath("resources/textures/cubemaps/space/right.jpg"),
+                    FileSystem::getPath("resources/textures/cubemaps/space/left.jpg"),
+                    FileSystem::getPath("resources/textures/cubemaps/space/up.jpg"),
+                    FileSystem::getPath("resources/textures/cubemaps/space/down.jpg"),
+                    FileSystem::getPath("resources/textures/cubemaps/space/front.jpg"),
+                    FileSystem::getPath("resources/textures/cubemaps/space/back.jpg")
             };
     unsigned int cubemapTexture = loadCubemap(faces);
     skyboxShader.use();
@@ -306,7 +315,7 @@ int main() {
 
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
-    pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
+    pointLight.ambient = glm::vec3(1, 1, 1);
     pointLight.diffuse = glm::vec3(1, 1, 1);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
@@ -315,9 +324,10 @@ int main() {
     pointLight.quadratic = 0.0f;
 
 
+    float time1=glfwGetTime();
 
+    glm::vec3 lightPos(cos(time1)*0.0f, 5.0f, sin(time1)*0.0f);
 
-    glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 
 
     // draw in wireframe
@@ -373,7 +383,7 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3(-4,4,6));// translate it down so it's at the center of the scene
+                               glm::vec3(-4,3.5,6));// translate it down so it's at the center of the scene
 
         model = glm::scale(model, glm::vec3(0.7,0.7,0.7));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
@@ -395,7 +405,17 @@ int main() {
 
         moonModel.Draw(ourShader);
 
+        glm::mat4 mod=glm::mat4(1.0);
+        mod=glm::scale(mod,glm::vec3(1));
+        mod=glm::translate(mod,glm::vec3(0.0,3.8,0.0));
+
+
+
+
+
+        // floor
         shader.use();
+        shader.setMat4("model",mod);
 
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
@@ -404,14 +424,18 @@ int main() {
         shader.setVec3("lightPos",lightPos);
         shader.setInt("blinn", blinn);
 
-        // floor
+
+        glDisable(GL_CULL_FACE);
         glBindVertexArray(planeVAO);
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        glEnable(GL_CULL_FACE);
 
-
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+//        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();
         view = glm::mat4(glm::mat3(programState->camera.GetViewMatrix())); // remove translation from the view matrix
         skyboxShader.setMat4("view", view);
@@ -422,7 +446,11 @@ int main() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+//        glDepthMask(GL_TRUE);
         glDepthFunc(GL_LESS); // set depth function back to default
+
+
+
 
 
 
@@ -438,6 +466,8 @@ int main() {
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+
     }
 
     glDeleteVertexArrays(1,&planeVAO);
