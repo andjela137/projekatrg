@@ -326,7 +326,7 @@ int main() {
 
     float time1=glfwGetTime();
 
-    glm::vec3 lightPos(cos(time1)*0.0f, 5.0f, sin(time1)*0.0f);
+    glm::vec3 lightPos(cos(time1)*10.0f, 6.0f, 20);
 
 
 
@@ -383,7 +383,7 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               glm::vec3(-4,3.5,6));// translate it down so it's at the center of the scene
+                               glm::vec3(-4,3.5,0));// translate it down so it's at the center of the scene
 
         model = glm::scale(model, glm::vec3(0.7,0.7,0.7));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
