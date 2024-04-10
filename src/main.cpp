@@ -472,6 +472,7 @@ int main() {
 
     glDeleteVertexArrays(1,&planeVAO);
     glDeleteBuffers(1,&planeVBO);
+    glDeleteBuffers(1, &planeEBO);
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &skyboxVAO);
 
@@ -649,4 +650,3 @@ unsigned int loadCubemap(vector<std::string> faces)
 
     return textureID;
 }
-
